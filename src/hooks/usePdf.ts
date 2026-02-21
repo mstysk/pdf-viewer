@@ -34,24 +34,30 @@ export function usePdf(pdfData: ArrayBuffer | null): UsePdfReturn {
       return;
     }
 
+    let cancelled = false;
     setIsLoading(true);
     setError(null);
 
-    const loadingTask = pdfjsLib.getDocument({ data: pdfData });
+    // ArrayBufferをコピーして渡す（Workerへの転送で元バッファが無効化されるのを防ぐ）
+    const loadingTask = pdfjsLib.getDocument({ data: new Uint8Array(pdfData.slice(0)) });
     loadingTask.promise
       .then((doc) => {
+        if (cancelled) return;
         pdfDocRef.current = doc;
         setTotalPages(doc.numPages);
         setCurrentPage(1);
       })
-      .catch((err) => {
+      .catch((err: Error) => {
+        // StrictModeのcleanupによるWorker破棄は無視する
+        if (cancelled || err.message === 'Worker was destroyed') return;
         setError(`PDFの読み込みに失敗しました: ${err.message}`);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       });
 
     return () => {
+      cancelled = true;
       loadingTask.destroy();
     };
   }, [pdfData]);
