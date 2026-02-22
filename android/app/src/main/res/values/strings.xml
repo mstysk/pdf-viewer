@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PDF Viewer</string>
+    <string name="title_activity_main">PDF Viewer</string>
+    <string name="package_name">com.mstysk.pdfviewer</string>
+    <string name="custom_url_scheme">com.mstysk.pdfviewer</string>
+</resources>

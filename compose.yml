@@ -1,0 +1,9 @@
+services:
+  dev:
+    image: ghcr.io/mstysk/pdf-viewer/android-builder:latest
+    volumes:
+      - .:/workspace
+    ports:
+      - "5173:5173"
+    command: npm run dev -- --host
+    working_dir: /workspace
